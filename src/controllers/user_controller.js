@@ -45,7 +45,6 @@ const registerUser = asyncHandler(
     }
 
     // console.log("avatarLocalPath->> ",avatarLocalPath);
-    // const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     // console.log("avatar->> ",avatar);

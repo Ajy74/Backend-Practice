@@ -226,7 +226,7 @@ const refreshAccessToken = asyncHandler(
     
             const { newAccessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user?._id);
 
-            console.log(`${user._id}\n\n${newAccessToken}\n\n${newRefreshToken}`)
+            // console.log(`${user._id}\n\n${newAccessToken}\n\n${newRefreshToken}`)
     
             return res
             .status(200)

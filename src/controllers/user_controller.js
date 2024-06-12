@@ -318,6 +318,7 @@ const updateUserAvatar = asyncHandler(
            throw new ApiError(400, "Avatar file is missing !");
         }
 
+        //TODO:- get previous avatar url details
         const avatar = await uploadOnCloudinary(avatarLocalPath);
         if(!avatar.url){
             throw new ApiError(400, "Error while uploading on avatar !");
@@ -333,6 +334,8 @@ const updateUserAvatar = asyncHandler(
             {new: true}
         ).select("-password");
 
+        //TODO:- delete previous file from cloudanary after changes 
+
         return res
         .status(200)
         .json(new ApiResponse(200, user, "Avatar updated successfully !")) ;
@@ -346,6 +349,7 @@ const updateUserCoverImage = asyncHandler(
            throw new ApiError(400, "Cover Image file is missing !");
         }
 
+        //TODO:- get previous avatar url details
         const coverImg = await uploadOnCloudinary(coverImgLocalPath);
         if(!coverImg.url){
             throw new ApiError(400, "Error while uploading on cover image !");
@@ -360,6 +364,8 @@ const updateUserCoverImage = asyncHandler(
             },
             {new: true}
         ).select("-password");
+
+        //TODO:- delete previous file from cloudanary after changes 
 
         return res
         .status(200)

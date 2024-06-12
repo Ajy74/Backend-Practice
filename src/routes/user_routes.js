@@ -38,22 +38,12 @@ userRouter.route("/get-user").post(verifyJWT, getCurrentUser)
 userRouter.route("/update-acccount-details").post(verifyJWT, updateAccountDetails)
 userRouter.route("/update-avatar").post(
     verifyJWT, 
-    // upload.field(
-    //     {
-    //         name: "avatar",
-    //         maxCount: 1
-    //     }
-    // ),
+    upload.single("avatar"),
     updateUserAvatar
 )
 userRouter.route("/update-cover-image").post(
     verifyJWT, 
-    upload.fields(
-        {
-            name: "coverImage",
-            maxCount: 1
-        }
-    ),
+    upload.single("coverImage"),
     updateUserCoverImage
 )
 

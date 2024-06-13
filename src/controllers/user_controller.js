@@ -5,6 +5,7 @@ import {uploadOnCloudinary} from "../utils/cloudnary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { json } from "express";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 
 
@@ -453,6 +454,65 @@ const getUserChannelProfile = asyncHandler(
 );
 
 
+const getWatchHistory = asyncHandler(
+    async (req, res) => {
+        const user = await User.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(req.user._id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "videos",
+                    localField: "watchHistory",
+                    foreignField: "_id",
+                    as: "watchHistory",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "owner",
+                                foreignField: "_id",
+                                as: "owner",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            fullname: 1,
+                                            username: 1,
+                                            avatar: 1
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            $addFields: {
+                                owner: {
+                                    $first: "$owner"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]);
+
+        if(!user?.length){
+            throw new ApiError(404, "user does not exists !");
+        }
+
+        console.log("user watch history aggreation docs:--> \n",channel);
+
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user[0], "user watch history details fetched successfully !")
+        );
+    }
+);
+
+
 export {
     registerUser, 
     loginUser, 
@@ -463,5 +523,6 @@ export {
     updateAccountDetails,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 } 

@@ -46,7 +46,8 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
     // TODO: update a comment
-    const { commentId, content }  = req.body;
+    const {commentId} = req.params
+    const { content }  = req.body;
 
     if(
         [commentId, content].some((field) => field?.trim() === "")

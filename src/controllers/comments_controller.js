@@ -70,7 +70,15 @@ const getVideoComments = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, comments[0], "vedio comments fetched successfully !")
+        new ApiResponse(
+            200, 
+            {
+                comments: comments[0],
+                page,
+                limit
+            }, 
+            "vedio comments fetched successfully !"
+        )
     );
 
 

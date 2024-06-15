@@ -500,12 +500,13 @@ const getWatchHistory = asyncHandler(
                 }
             }
         ]);
+        //*NOTE: first was used to get first document from owner array list
 
         if(!user?.length){
             throw new ApiError(404, "user does not exists !");
         }
 
-        console.log("user watch history aggreation docs:--> \n",channel);
+        console.log("user watch history aggreation docs:--> \n",user);
 
         return res
         .status(200)

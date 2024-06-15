@@ -9,6 +9,71 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "Invalid video ID!");
+    }
+
+    const videoCommentsPipeline = [
+        {
+            $match: {
+                video: mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            fullname: 1,
+                            username: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                owner: {
+                    $first: "$owner"
+                }
+            }
+        },
+        {
+            $project: {
+                content: 1,
+                video: 1,
+                owner: 1,
+                updatedAt: 1
+            }
+        }
+    ];  
+
+    const paginateOptions = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10)
+    };
+
+    //~ execution of aggreation pipeline with pagination
+    const comments = await Comment.aggregatePaginate(Comment.aggregate(videoCommentsPipeline), paginateOptions);
+
+    if(!comments?.length){
+        throw new ApiError(404, "comments not available !");
+    }
+
+    console.log("get vedio comments aggreation docs:--> \n",comments);
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, comments[0], "vedio comments fetched successfully !")
+    );
+
+
 })
 
 const addComment = asyncHandler(async (req, res) => {

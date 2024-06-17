@@ -15,6 +15,60 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
     // TODO: get video, upload to cloudinary, create video
+
+    const videoFilePath = req.files?.videoFile[0]?.path
+    const thumbnailFilePath = req.files?.thumbnail[0]?.path
+
+    if(!videoFilePath){
+        throw new ApiError(400, "Video file is missing !");
+    }
+    if(!thumbnailFilePath){
+        throw new ApiError(400, "Thumbnail file is missing !");
+    }
+
+    if(title.trim() === ""){
+        throw new ApiError(400, "Title is required !");
+    }
+    if(description.trim() === ""){
+        throw new ApiError(400, "Description is required !");
+    }
+
+
+    try {
+        const videoUploaded = await uploadOnCloudinary(videoFilePath);
+        const thumbnailUploaded = await uploadOnCloudinary(thumbnailFilePath);
+
+        console.log("video docs >>\n",videoUploaded);
+
+        if(!videoUploaded){
+            throw new ApiError(500, "Something went wrong while uploading video !");
+        }
+        if(!thumbnailUploaded){
+            throw new ApiError(500, "Something went wrong while uploading thumbnail !");
+        }
+
+
+        // const newVideo = await Video.create({
+        //     videoFile: videoUploaded.url,
+        //     thumbnail: thumbnailUploaded.url,
+        //     title,
+        //     description,
+        //     duration: videoUploaded.duration,
+        //     isPublished: true,
+        //     owner: mongoose.Types.ObjectId(req.user?._id)
+        // });
+
+        // if(!newVideo){
+        //     throw new ApiError(500, "Something went wrong while publishing video !");
+        // }
+
+        return res.status(201).json(
+            new ApiResponse(200, videoUploaded, "Video pulished Succefully")
+        );
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while uploading video or thumbnail file !");
+    }
+
 })
 
 const getVideoById = asyncHandler(async (req, res) => {

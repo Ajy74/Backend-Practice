@@ -50,7 +50,16 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
                 from: "videos",
                 localField: "videos",
                 foreignField: "_id",
-                as: "videos"
+                as: "videos",
+                pipeline: [
+                    {
+                        $project: {
+                            title: 1,
+                            description: 1,
+                            thumbnail: 1
+                        }
+                    }
+                ]
             }
         },
         {
@@ -64,6 +73,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
             $project:{
                 name: 1,
                 description: 1,
+                videos: 1,
                 videosCount: 1,
             }
         }
@@ -114,16 +124,14 @@ const getPlaylistById = asyncHandler(async (req, res) => {
                             avatar: 1
                         }
                     },
-                    {
-                        $addFields: {
-                            owner: {
-                                $first: "$owner"
-                            }
-                        }
-                    }
                 ]
             }
         },
+        {
+            $unwind: {
+                path: "$owner"
+            }
+        }
     ]);
 
     if(!playlist){
@@ -145,12 +153,12 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid video ID !")
     }
 
-    const playlist = await Playlist.findOne(playlistId);
+    const playlist = await Playlist.findById(playlistId);
     if(!playlist){
         throw new ApiError(400, "Playlist Not Found !")
     }
 
-    playlist.videos.push(mongoose.Types.ObjectId.isValid(videoId));
+    playlist.videos.push(videoId);
     await playlist.save({validateBeforeSave: false});
 
     return res.status(200).json(

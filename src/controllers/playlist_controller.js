@@ -167,7 +167,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 })
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
-    const {playlistId, videoId} = req.params
+    const {videoId, playlistId} = req.params
     // TODO: remove video from playlist
 
     if (!mongoose.Types.ObjectId.isValid(playlistId)) {
@@ -227,7 +227,7 @@ const updatePlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "description field required !")
     }
  
-    const playlist = await Playlist.findOne(playlistId);
+    const playlist = await Playlist.findById(playlistId);
     if(!playlist){
         throw new ApiError(400, "Playlist Not Found !")
     }

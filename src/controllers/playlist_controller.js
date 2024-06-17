@@ -18,7 +18,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
     const newPlayList = await Playlist.create({
         name,
         description,
-        owner: mongoose.Types.ObjectId(req.user?._id)
+        owner: req.user?._id
     });
 
     if(!newPlayList){
@@ -42,7 +42,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     const userPlayLists = await Playlist.aggregate([
         {
             $match: {
-                owner: mongoose.Types.ObjectId(userId)
+                owner: new mongoose.Types.ObjectId(userId)
             }
         },
         {
@@ -89,7 +89,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     const playlist = await Playlist.aggregate([
         {
             $match: {
-                _id: mongoose.Types.ObjectId(playlistId)
+                _id: new mongoose.Types.ObjectId(playlistId)
             }
         },
         {
@@ -172,7 +172,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const updatedPlaylist = await Playlist.findByIdAndUpdate(
         playlistId,
         {
-            $pull: { videos: mongoose.Types.ObjectId(videoId) }
+            $pull: { videos: new mongoose.Types.ObjectId(videoId) }
         },
         { new: true }
     );

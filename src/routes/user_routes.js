@@ -35,7 +35,7 @@ userRouter.route("/login").post(loginUser)
 //~ secured routes
 userRouter.route("/logout").post( verifyJWT, logoutUser ) // it will first verify user then logout
 userRouter.route("/refresh-token").post(refreshAccessToken)
-userRouter.route("/change-passowrd").post(verifyJWT, changeCurrentPassword)
+userRouter.route("/change-password").post(verifyJWT, changeCurrentPassword)
 userRouter.route("/get-user").post(verifyJWT, getCurrentUser)
 userRouter.route("/update-acccount-details").patch(verifyJWT, updateAccountDetails) //* to avoid all details update ..use patch() method
 userRouter.route("/update-avatar").patch(

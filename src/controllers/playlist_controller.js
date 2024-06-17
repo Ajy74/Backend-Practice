@@ -80,6 +80,25 @@ const getPlaylistById = asyncHandler(async (req, res) => {
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(playlistId)){
+        throw new ApiError(400, "Invalid playlist ID !")
+    }
+    if(!mongoose.Types.ObjectId.isValid(videoId)){
+        throw new ApiError(400, "Invalid video ID !")
+    }
+
+    const playlist = await Playlist.findOne(playlistId);
+    if(!playlist){
+        throw new ApiError(400, "Playlist Not Found !")
+    }
+
+    playlist.videos.push(mongoose.Types.ObjectId.isValid(videoId));
+    await playlist.save({validateBeforeSave: false});
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "video added to playlist succefully !")
+    );
 })
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
@@ -91,12 +110,50 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 const deletePlaylist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
     // TODO: delete playlist
+
+    if(!mongoose.Types.ObjectId.isValid(playlistId)){
+        throw new ApiError(400, "Invalid playlist ID !")
+    }
+    
+    const playlist = await Playlist.findByIdAndDelete(playlistId);
+    if(!playlist){
+        throw new ApiError(400, "Playlist Not Found !")
+    }
+
+    
+    return res.status(200).json(
+        new ApiResponse(200, {}, "playlist deleted succefully !")
+    );
 })
 
 const updatePlaylist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
     const {name, description} = req.body
     //TODO: update playlist
+
+    if(!mongoose.Types.ObjectId.isValid(playlistId)){
+        throw new ApiError(400, "Invalid playlist ID !")
+    }
+
+    if(name.trim() === ""){
+        throw new ApiError(400, "name field required !")
+    }
+    if(description.trim() === ""){
+        throw new ApiError(400, "description field required !")
+    }
+ 
+    const playlist = await Playlist.findOne(playlistId);
+    if(!playlist){
+        throw new ApiError(400, "Playlist Not Found !")
+    }
+
+    playlist.name = name;
+    playlist.description = description;
+    await playlist.save();
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Playlist updated succefully !")
+    );
 })
 
 export {

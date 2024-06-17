@@ -84,7 +84,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(
-        new ApiResponse(200, userPlayLists, "User playlist fetched succefully !")
+        new ApiResponse(200, userPlayLists[0], "User playlist fetched succefully !")
     );
 })
 
@@ -139,7 +139,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(
-        new ApiResponse(200, playlist, "playlist fetched succefully !")
+        new ApiResponse(200, playlist[0], "playlist fetched succefully !")
     );
 })
 

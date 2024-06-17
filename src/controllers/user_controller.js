@@ -258,7 +258,15 @@ const changeCurrentPassword = asyncHandler(
     async (req, res) => {
         const {oldPassword, newPassword} = req.body
 
-        const user = await User.findById(req._id);
+        if(oldPassword.trim() === ""){
+            throw new ApiError(400, "old password required !")
+        }
+
+        if(newPassword.trim() === ""){
+            throw new ApiError(400, "new password required !")
+        }
+
+        const user = await User.findById(req.user?._id);
 
         const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
         if(!isPasswordCorrect){
@@ -282,9 +290,11 @@ const getCurrentUser = asyncHandler(
         return res
         .status(200)
         .json(
-            200,
-            req.user,
-            "current user fetched succesfully !"
+            new ApiResponse(
+                200,
+                req.user,
+                "current user fetched succesfully !"
+            )
         );
     }
 );
@@ -309,6 +319,10 @@ const updateAccountDetails = asyncHandler(
             {new: true}
         ).select("-password");
 
+        if(!user){
+            throw ApiError(500, "Something went wrong while updating account !")
+        }
+
         return res
         .status(200)
         .json(new ApiResponse(200, user, "details updated successfully !")) ;
@@ -324,7 +338,7 @@ const updateUserAvatar = asyncHandler(
 
         //TODO:- get previous avatar url details
         const avatar = await uploadOnCloudinary(avatarLocalPath);
-        if(!avatar.url){
+        if(!avatar){
             throw new ApiError(400, "Error while uploading on avatar !");
         }
 
@@ -339,6 +353,10 @@ const updateUserAvatar = asyncHandler(
         ).select("-password");
 
         //TODO:- delete previous file from cloudanary after changes 
+        
+        if(!user){
+            throw ApiError(500, "Something went wrong while updating avatar !")
+        }
 
         return res
         .status(200)
@@ -355,7 +373,7 @@ const updateUserCoverImage = asyncHandler(
 
         //TODO:- get previous avatar url details
         const coverImg = await uploadOnCloudinary(coverImgLocalPath);
-        if(!coverImg.url){
+        if(!coverImg){
             throw new ApiError(400, "Error while uploading on cover image !");
         }
 
@@ -370,6 +388,10 @@ const updateUserCoverImage = asyncHandler(
         ).select("-password");
 
         //TODO:- delete previous file from cloudanary after changes 
+
+        if(!user){
+            throw ApiError(500, "Something went wrong while updating cover image !")
+        }
 
         return res
         .status(200)
@@ -446,7 +468,7 @@ const getUserChannelProfile = asyncHandler(
             throw new ApiError(404, "channel does not exists !");
         }
 
-        console.log("channel aggreation docs:--> \n",channel);
+        // console.log("channel aggreation docs:--> \n",channel);
 
         return res
         .status(200)
@@ -506,7 +528,7 @@ const getWatchHistory = asyncHandler(
             throw new ApiError(404, "user does not exists !");
         }
 
-        console.log("user watch history aggreation docs:--> \n",user);
+        // console.log("user watch history aggreation docs:--> \n",user);
 
         return res
         .status(200)

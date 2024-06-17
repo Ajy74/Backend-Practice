@@ -39,7 +39,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         const thumbnailUploaded = await uploadOnCloudinary(thumbnailFilePath);
         const videoUploaded = await uploadOnCloudinary(videoFilePath);
 
-        console.log("video docs >>\n",videoUploaded);
+        // console.log("video docs >>\n",videoUploaded);
 
         if(!videoUploaded){
             throw new ApiError(500, "Something went wrong while uploading video !");
@@ -128,6 +128,24 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(videoId)){
+        throw new ApiError(400, "Invalid video ID !");
+    }
+
+    const video = await Video.findById(videoId);
+    video.isPublished = !video.isPublished;
+    await video.save({validateBeforeSave: false});
+
+    if(!video){
+        throw new ApiError(500, "Something went wrong while toggle publish status of video !");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, {}, "publish status updated sucessfully !")
+    );
 })
 
 export {
